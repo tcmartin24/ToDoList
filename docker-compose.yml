@@ -1,0 +1,35 @@
+﻿version: '3.8'
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+
+  todolist-api:
+    image: todolist-api
+    build:
+      context: .
+      dockerfile: ToDoList-API/Dockerfile
+    ports:
+      - "5000:80"  # Adjust these ports as needed
+    depends_on:
+      - sqlserver
+
+  todolist-react:
+    image: todolist-react
+    build:
+      context: .
+      dockerfile: ToDoList-React/Dockerfile
+    ports:
+      - "3000:3000"  # Adjust these ports as needed
+    depends_on:
+      - todolist-api
+
+volumes:
+  sqlserver_data:
