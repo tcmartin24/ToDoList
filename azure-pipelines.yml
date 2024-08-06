@@ -1,0 +1,35 @@
+trigger:
+  - main
+
+variables:
+  - group: azure-config
+  # This variable group should contain:
+  # - acrName: Name of your Azure Container Registry
+  # - acrLoginServer: Login server for your ACR (usually <acrName>.azurecr.io)
+
+stages:
+  - stage: Build
+    jobs:
+      - job: BuildAndPushImages
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: Docker@2
+            inputs:
+              containerRegistry: 'myAzureContainerRegistry'
+              repository: 'todolist-api'
+              command: 'buildAndPush'
+              Dockerfile: '**/ToDoList-API/Dockerfile'
+              tags: |
+                $(Build.BuildId)
+                latest
+
+          - task: Docker@2
+            inputs:
+              containerRegistry: 'myAzureContainerRegistry'
+              repository: 'todo-list-react'
+              command: 'buildAndPush'
+              Dockerfile: '**/todo-list-react/Dockerfile'
+              tags: |
+                $(Build.BuildId)
+                latest
