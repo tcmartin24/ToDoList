@@ -14,6 +14,10 @@ builder.Services.AddSwaggerGen();
 builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
 builder.Logging.AddConsole();
 
+// Add health checks
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<TodoContext>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -27,12 +31,14 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-// Use CORS
+// Configure CORS
+var corsOrigins = builder.Configuration.GetValue<string>("CorsOrigins")?.Split(',') ?? Array.Empty<string>();
 app.UseCors(builder => builder
-    .AllowAnyOrigin()
+    .WithOrigins(corsOrigins)
     .AllowAnyMethod()
     .AllowAnyHeader());
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();

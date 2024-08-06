@@ -4,7 +4,7 @@ import TodoList from './components/TodoList';
 import AddTodoForm from './components/AddTodoForm';
 import { Todo } from "./shared/types";
 
-const API_BASE_URL = '/api/todos';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/todos';
 
 function App() {
     const [todos, setTodos] = useState<Todo[]>([]);

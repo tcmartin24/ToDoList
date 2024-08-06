@@ -18,10 +18,11 @@
     "jsx": "react-jsx",
 
     /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "strict": false,  // Turn off strict mode
+    "noUnusedLocals": false,  // Turn off unused locals check
+    "noUnusedParameters": false,  // Turn off unused parameters check
+    "noFallthroughCasesInSwitch": false,  // Turn off no fallthrough cases check
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src"]
 }

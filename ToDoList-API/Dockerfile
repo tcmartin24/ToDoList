@@ -20,4 +20,5 @@ RUN dotnet publish "ToDoList-API.csproj" -c $BUILD_CONFIGURATION -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+HEALTHCHECK CMD curl --fail http://localhost:8080/health || exit
 ENTRYPOINT ["dotnet", "ToDoList-API.dll"]
