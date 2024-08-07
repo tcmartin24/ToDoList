@@ -1,0 +1,40 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - main
+      - dockerized
+
+env:
+  ACR_NAME: ${{ secrets.ACR_NAME }}
+  ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Log in to Azure Container Registry
+        run: |
+          echo ${{ secrets.AZURE_CREDENTIALS }} | docker login ${{ secrets.ACR_LOGIN_SERVER }} --username ${{ secrets.ACR_USERNAME }} --password-stdin
+
+      - name: Build and push ToDoList-API Docker image
+        run: |
+          docker build -t ${{ env.ACR_LOGIN_SERVER }}/todolist-api:latest -t ${{ env.ACR_LOGIN_SERVER }}/todolist-api:${{ github.run_id }} -f **/ToDoList-API/Dockerfile .
+          docker push ${{ env.ACR_LOGIN_SERVER }}/todolist-api:latest
+          docker push ${{ env.ACR_LOGIN_SERVER }}/todolist-api:${{ github.run_id }}
+
+      - name: Build and push todo-list-react Docker image
+        run: |
+          docker build -t ${{ env.ACR_LOGIN_SERVER }}/todo-list-react:latest -t ${{ env.ACR_LOGIN_SERVER }}/todo-list-react:${{ github.run_id }} -f **/todo-list-react/Dockerfile .
+          docker push ${{ env.ACR_LOGIN_SERVER }}/todo-list-react:latest
+          docker push ${{ env.ACR_LOGIN_SERVER }}/todo-list-react:${{ github.run_id }}
