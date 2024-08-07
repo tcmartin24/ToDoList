@@ -47,28 +47,25 @@ jobs:
           echo "Looking for Dockerfile:"
           find . -name Dockerfile
           
+      - name: Debug ACR_LOGIN_SERVER
+        run: |
+          echo "ACR_LOGIN_SERVER is set: ${{ env.ACR_LOGIN_SERVER != '' }}"
+          echo "First 5 characters of ACR_LOGIN_SERVER: ${ACR_LOGIN_SERVER:0:5}"
+
       - name: Build and push ToDoList-API Docker image
         run: |
-          echo "ACR_LOGIN_SERVER: ${ACR_LOGIN_SERVER}"
-          echo "GITHUB_RUN_ID: ${{ github.run_id }}"
-          echo "Attempting to build image..."
+          echo "Building image..."
           docker build -t todolist-api:latest -f ./ToDoList-API/Dockerfile .
-          echo "Docker build command exit code: $?"
-          echo "Listing Docker images:"
-          docker images
-          echo "ACR_LOGIN_SERVER value:"
-          echo "${ACR_LOGIN_SERVER}" | od -c
-          echo "Attempting to tag image..."
-          docker tag todolist-api:latest "${ACR_LOGIN_SERVER}/todolist-api:latest" || echo "Tagging failed"
-          echo "Docker tag command exit code: $?"
-          echo "Listing Docker images after tagging:"
-          docker images
-          echo "Attempting to push..."
-          docker push "${ACR_LOGIN_SERVER}/todolist-api:latest" || echo "Push failed"
-          echo "Docker push command exit code: $?"
+          echo "Tagging image..."
+          docker tag todolist-api:latest ${ACR_LOGIN_SERVER}/todolist-api:latest
+          echo "Pushing image..."
+          docker push ${ACR_LOGIN_SERVER}/todolist-api:latest
 
       - name: Build and push todo-list-react Docker image
         run: |
-          docker build -t ${{ env.ACR_LOGIN_SERVER }}/todo-list-react:latest -t ${{ env.ACR_LOGIN_SERVER }}/todo-list-react:${{ github.run_id }} -f **/todo-list-react/Dockerfile .
-          docker push ${{ env.ACR_LOGIN_SERVER }}/todo-list-react:latest
-          docker push ${{ env.ACR_LOGIN_SERVER }}/todo-list-react:${{ github.run_id }}
+          echo "Building image..."
+          docker build -t todo-list-react:latest -f ./todo-list-react/Dockerfile .
+          echo "Tagging image..."
+          docker tag todo-list-react:latest ${ACR_LOGIN_SERVER}/todo-list-react:latest
+          echo "Pushing image..."
+          docker push ${ACR_LOGIN_SERVER}/todo-list-react:latest
