@@ -27,6 +27,12 @@ jobs:
         run: |
           az acr login --name ${{ env.ACR_NAME }}
 
+      - name: Debug Docker build command
+        run: |
+          echo "ACR_LOGIN_SERVER is set: ${{ env.ACR_LOGIN_SERVER != '' }}"
+          echo "First part of ACR_LOGIN_SERVER: ${ACR_LOGIN_SERVER%%.*}"
+          echo "Docker build command: docker build -t \${ACR_LOGIN_SERVER}/todolist-api:latest -t \${ACR_LOGIN_SERVER}/todolist-api:\${GITHUB_RUN_ID} -f **/ToDoList-API/Dockerfile ."
+          
       - name: Build and push ToDoList-API Docker image
         run: |
           docker build -t ${{ env.ACR_LOGIN_SERVER }}/todolist-api:latest -t ${{ env.ACR_LOGIN_SERVER }}/todolist-api:${{ github.run_id }} -f **/ToDoList-API/Dockerfile .
