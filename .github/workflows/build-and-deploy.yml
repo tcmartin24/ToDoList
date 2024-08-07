@@ -38,8 +38,21 @@ jobs:
           echo "First part of ACR_LOGIN_SERVER: ${ACR_LOGIN_SERVER%%.*}"
           echo "Docker build command: docker build -t \${ACR_LOGIN_SERVER}/todolist-api:latest -t \${ACR_LOGIN_SERVER}/todolist-api:\${GITHUB_RUN_ID} -f **/ToDoList-API/Dockerfile ."
           
+      - name: List directory contents
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Contents of current directory:"
+          ls -R
+          echo "Looking for Dockerfile:"
+          find . -name Dockerfile
+          
       - name: Build and push ToDoList-API Docker image
         run: |
+          echo "ACR_LOGIN_SERVER: ${ACR_LOGIN_SERVER}"
+          echo "Building image without tag first..."
+          docker build -f ./ToDoList-API/Dockerfile .
+          echo "Docker build command exit code: $?"
           echo "ACR_LOGIN_SERVER: ${ACR_LOGIN_SERVER}"
           echo "Building image without tag first..."
           docker build -f **/ToDoList-API/Dockerfile .
