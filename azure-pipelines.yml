@@ -1,6 +1,7 @@
 resources:
   pipelines: []
 
+
 trigger:
   - main
 
