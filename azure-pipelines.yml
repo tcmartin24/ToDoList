@@ -6,12 +6,16 @@ variables:
   # This variable group should contain:
   # - acrName: Name of your Azure Container Registry
   # - acrLoginServer: Login server for your ACR (usually <acrName>.azurecr.io)
+  
+concurrency:
+  cancel-in-progress: true  
 
 stages:
   - stage: Build
     jobs:
       - job: BuildAndPushImages
         pool:
+          name: 'Azure Pipelines'
           vmImage: 'ubuntu-latest'
         steps:
           - task: Docker@2
