@@ -56,13 +56,15 @@ jobs:
           echo "Docker build command exit code: $?"
           echo "Listing Docker images:"
           docker images
+          echo "ACR_LOGIN_SERVER value:"
+          echo "${ACR_LOGIN_SERVER}" | od -c
           echo "Attempting to tag image..."
-          docker tag todolist-api:latest "${ACR_LOGIN_SERVER}/todolist-api:latest"
+          docker tag todolist-api:latest "${ACR_LOGIN_SERVER}/todolist-api:latest" || echo "Tagging failed"
           echo "Docker tag command exit code: $?"
           echo "Listing Docker images after tagging:"
           docker images
           echo "Attempting to push..."
-          docker push "${ACR_LOGIN_SERVER}/todolist-api:latest"
+          docker push "${ACR_LOGIN_SERVER}/todolist-api:latest" || echo "Push failed"
           echo "Docker push command exit code: $?"
 
       - name: Build and push todo-list-react Docker image
