@@ -50,13 +50,19 @@ jobs:
       - name: Build and push ToDoList-API Docker image
         run: |
           echo "ACR_LOGIN_SERVER: ${ACR_LOGIN_SERVER}"
-          echo "Building image..."
-          docker build -t "${ACR_LOGIN_SERVER}/todolist-api:latest" -t "${ACR_LOGIN_SERVER}/todolist-api:${{ github.run_id }}" -f ./ToDoList-API/Dockerfile .
+          echo "GITHUB_RUN_ID: ${{ github.run_id }}"
+          echo "Attempting to build image..."
+          docker build -t todolist-api:latest -f ./ToDoList-API/Dockerfile .
           echo "Docker build command exit code: $?"
+          echo "Listing Docker images:"
+          docker images
+          echo "Attempting to tag image..."
+          docker tag todolist-api:latest "${ACR_LOGIN_SERVER}/todolist-api:latest"
+          echo "Docker tag command exit code: $?"
+          echo "Listing Docker images after tagging:"
           docker images
           echo "Attempting to push..."
           docker push "${ACR_LOGIN_SERVER}/todolist-api:latest"
-          docker push "${ACR_LOGIN_SERVER}/todolist-api:${{ github.run_id }}"
           echo "Docker push command exit code: $?"
 
       - name: Build and push todo-list-react Docker image
