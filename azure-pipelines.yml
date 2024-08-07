@@ -1,3 +1,6 @@
+resources:
+  pipelines: []
+
 trigger:
   - main
 
@@ -7,9 +10,6 @@ variables:
   # - acrName: Name of your Azure Container Registry
   # - acrLoginServer: Login server for your ACR (usually <acrName>.azurecr.io)
   
-concurrency:
-  cancel-in-progress: true  
-
 stages:
   - stage: Build
     jobs:
