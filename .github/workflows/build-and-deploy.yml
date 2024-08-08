@@ -93,12 +93,7 @@ jobs:
 
       - name: Ensure package-lock.json is generated
         run: |
-#            echo "pwd..."
-#            pwd
-#            find ./
-#            echo "where is npm?"
-#            whereis npm
-            npm install
+          npm install
         working-directory: ./todo-list-react
           
       - name: Build and push todo-list-react Docker image
