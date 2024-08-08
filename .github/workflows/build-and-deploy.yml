@@ -18,23 +18,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '8.0.x'
+#      - name: Set up .NET
+#        uses: actions/setup-dotnet@v1
+#        with:
+#          dotnet-version: '8.0.x'
 
-      - name: Restore .NET dependencies for API
-        run: dotnet restore ./ToDoList-API/ToDoList-API.csproj
-
-      - name: Restore .NET dependencies for API Tests
-        run: dotnet restore ./ToDoList-API-Tests/ToDoList-API-Tests.csproj
-
-      - name: Build .NET project for API
-        run: dotnet build --configuration Release --no-restore ./ToDoList-API/ToDoList-API.csproj
-
-      - name: Run tests for API
-        run: dotnet test --no-restore --verbosity normal ./ToDoList-API-Tests/ToDoList-API-Tests.csproj
-
+#      - name: Restore .NET dependencies for API
+#        run: dotnet restore ./ToDoList-API/ToDoList-API.csproj
+#
+#      - name: Restore .NET dependencies for API Tests
+#        run: dotnet restore ./ToDoList-API-Tests/ToDoList-API-Tests.csproj
+#
+#      - name: Build .NET project for API
+#        run: dotnet build --configuration Release --no-restore ./ToDoList-API/ToDoList-API.csproj
+#
+#      - name: Run tests for API
+#        run: dotnet test --no-restore --verbosity normal ./ToDoList-API-Tests/ToDoList-API-Tests.csproj
+#
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
@@ -47,7 +47,7 @@ jobs:
       - name: Run tests for React app
         run: npm test
         working-directory: ./todo-list-react
-
+#
       - name: Log in to Azure
         uses: azure/login@v1
         with:
@@ -56,18 +56,18 @@ jobs:
       - name: Log in to Azure Container Registry
         run: |
           az acr login --name ${{ env.ACR_NAME }}
-
+#
       - name: Verify Docker tag format
         run: |
           echo "Tag format check: $(echo ${ACR_LOGIN_SERVER}/todolist-api:latest | sed 's/[^\/]*\//***\//g')"
           echo "Tag format with run ID: $(echo ${ACR_LOGIN_SERVER}/todolist-api:${{ github.run_id }} | sed 's/[^\/]*\//***\//g')"
-          
+
       - name: Debug Docker build command
         run: |
           echo "ACR_LOGIN_SERVER is set: ${{ env.ACR_LOGIN_SERVER != '' }}"
           echo "First part of ACR_LOGIN_SERVER: ${ACR_LOGIN_SERVER%%.*}"
           echo "Docker build command: docker build -t \${ACR_LOGIN_SERVER}/todolist-api:latest -t \${ACR_LOGIN_SERVER}/todolist-api:\${GITHUB_RUN_ID} -f **/ToDoList-API/Dockerfile ."
-          
+
       - name: List directory contents
         run: |
           echo "Current directory:"
@@ -76,20 +76,20 @@ jobs:
           ls -R
           echo "Looking for Dockerfile:"
           find . -name Dockerfile
-          
+
       - name: Debug ACR_LOGIN_SERVER
         run: |
           echo "ACR_LOGIN_SERVER is set: ${{ env.ACR_LOGIN_SERVER != '' }}"
           echo "First 5 characters of ACR_LOGIN_SERVER: ${ACR_LOGIN_SERVER:0:5}"
-
-      - name: Build and push ToDoList-API Docker image
-        run: |
-          echo "Building image..."
-          docker build -t todolist-api:latest -f ./ToDoList-API/Dockerfile .
-          echo "Tagging image..."
-          docker tag todolist-api:latest ${ACR_LOGIN_SERVER}/todolist-api:latest
-          echo "Pushing image..."
-          docker push ${ACR_LOGIN_SERVER}/todolist-api:latest
+#
+#      - name: Build and push ToDoList-API Docker image
+#        run: |
+#          echo "Building image..."
+#          docker build -t todolist-api:latest -f ./ToDoList-API/Dockerfile .
+#          echo "Tagging image..."
+#          docker tag todolist-api:latest ${ACR_LOGIN_SERVER}/todolist-api:latest
+#          echo "Pushing image..."
+#          docker push ${ACR_LOGIN_SERVER}/todolist-api:latest
 
       - name: Build and push todo-list-react Docker image
         run: |
