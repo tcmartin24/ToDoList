@@ -91,6 +91,10 @@ jobs:
 #          echo "Pushing image..."
 #          docker push ${ACR_LOGIN_SERVER}/todolist-api:latest
 
+      - name: Ensure package-lock.json is generated
+          run: npm install
+          working-directory: ./todo-list-react
+          
       - name: Build and push todo-list-react Docker image
         run: |
           echo "Building image..."
