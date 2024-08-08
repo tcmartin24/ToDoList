@@ -88,9 +88,9 @@ resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
     capacity: 1
   }
   properties: {
-    collation: 'SQL_Latin1_General_CP1_CI_AS'
-    maxSizeBytes: 1073741824
-    minCapacity: 0.5
+    collation: 'SQL_Latin1_General_CP1_CI_AS',
+    maxSizeBytes: 1073741824,
+    minCapacity: 0.5,
     autoPauseDelay: 60
   }
   tags: {
