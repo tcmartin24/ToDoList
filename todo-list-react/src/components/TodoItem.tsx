@@ -18,6 +18,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onToggle, onDelete, onEdit, i
                     className="form-check-input me-2"
                     checked={todo.isComplete}
                     onChange={() => onToggle(todo.id)}
+                    data-testid={`todo-checkbox-${todo.id}`}
                     disabled={isLoading}
                 />
                 <span
