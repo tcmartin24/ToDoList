@@ -18,17 +18,15 @@ describe('Todo App Integration Tests', () => {
     test('adds a new todo', async () => {
         render(<App />);
 
-        const input = await waitFor(() => screen.getByPlaceholderText('Enter todo'));
-        const addButton = await waitFor(() => screen.getByText('Add'));
+        const input = await screen.findByPlaceholderText('Enter todo');
+        const addButton = await screen.findByText('Add');
 
         mockedAxios.post.mockResolvedValue({ data: { id: 1, title: 'New Todo', isComplete: false } });
 
         await userEvent.type(input, 'New Todo');
         fireEvent.click(addButton);
 
-        await waitFor(() => {
-            expect(screen.getByText('New Todo')).toBeInTheDocument();
-        });
+        await screen.findByText('New Todo');
     });
 
     test('toggles todo completion', async () => {
@@ -38,16 +36,13 @@ describe('Todo App Integration Tests', () => {
 
         render(<App />);
 
-        await waitFor(() => {
-            expect(screen.getByText('Existing Todo')).toBeInTheDocument();
-        });
+        await screen.findByText('Existing Todo');
 
         mockedAxios.put.mockResolvedValue({
             data: { id: 1, title: 'Existing Todo', isComplete: true }
         });
 
-        const checkboxes = screen.getAllByRole('checkbox');
-        const todoCheckbox = checkboxes.find((checkbox) => !checkbox.checked);
+        const todoCheckbox = await screen.findByRole('checkbox', { name: /Existing Todo/i });
         fireEvent.click(todoCheckbox);
 
         await waitFor(() => {
@@ -62,13 +57,11 @@ describe('Todo App Integration Tests', () => {
 
         render(<App />);
 
-        await waitFor(() => {
-            expect(screen.getByText('Todo to Delete')).toBeInTheDocument();
-        });
+        await screen.findByText('Todo to Delete');
 
         mockedAxios.delete.mockResolvedValue({});
 
-        const deleteButton = screen.getByText('Delete');
+        const deleteButton = await screen.findByText('Delete');
         fireEvent.click(deleteButton);
 
         await waitFor(() => {
@@ -83,14 +76,12 @@ describe('Todo App Integration Tests', () => {
 
         render(<App />);
 
-        await waitFor(() => {
-            expect(screen.getByText('Todo to Edit')).toBeInTheDocument();
-        });
+        await screen.findByText('Todo to Edit');
 
-        const editButton = screen.getByText('Edit');
+        const editButton = await screen.findByText('Edit');
         fireEvent.click(editButton);
 
-        const input = await waitFor(() => screen.getByDisplayValue('Todo to Edit'));
+        const input = await screen.findByDisplayValue('Todo to Edit');
         await userEvent.clear(input);
         await userEvent.type(input, 'Edited Todo');
 
@@ -98,12 +89,10 @@ describe('Todo App Integration Tests', () => {
             data: { id: 1, title: 'Edited Todo', isComplete: false }
         });
 
-        const updateButton = screen.getByText('Update');
+        const updateButton = await screen.findByText('Update');
         fireEvent.click(updateButton);
 
-        await waitFor(() => {
-            expect(screen.getByText('Edited Todo')).toBeInTheDocument();
+        await screen.findByText('Edited Todo');
             expect(screen.queryByText('Todo to Edit')).not.toBeInTheDocument();
         });
     });
-});
