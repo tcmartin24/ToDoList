@@ -18,6 +18,33 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore .NET dependencies for API
+        run: dotnet restore ./ToDoList-API/ToDoList-API.csproj
+
+      - name: Build .NET project for API
+        run: dotnet build --configuration Release --no-restore ./ToDoList-API/ToDoList-API.csproj
+
+      - name: Run tests for API
+        run: dotnet test --no-restore --verbosity normal ./ToDoList-API-Tests/ToDoList-API-Tests.csproj
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+
+      - name: Install dependencies for React app
+        run: npm install
+        working-directory: ./todo-list-react
+
+      - name: Run tests for React app
+        run: npm test
+        working-directory: ./todo-list-react
+
       - name: Log in to Azure
         uses: azure/login@v1
         with:
