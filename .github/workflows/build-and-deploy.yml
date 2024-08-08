@@ -26,6 +26,9 @@ jobs:
       - name: Restore .NET dependencies for API
         run: dotnet restore ./ToDoList-API/ToDoList-API.csproj
 
+      - name: Restore .NET dependencies for API Tests
+        run: dotnet restore ./ToDoList-API-Tests/ToDoList-API-Tests.csproj
+
       - name: Build .NET project for API
         run: dotnet build --configuration Release --no-restore ./ToDoList-API/ToDoList-API.csproj
 
