@@ -9,7 +9,7 @@
     "skipLibCheck": true,
 
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -22,7 +22,10 @@
     "noUnusedLocals": false,  // Turn off unused locals check
     "noUnusedParameters": false,  // Turn off unused parameters check
     "noFallthroughCasesInSwitch": false,  // Turn off no fallthrough cases check
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+
+    /* Jest specific */
+    "types": ["jest", "@testing-library/jest-dom"]
   },
   "include": ["src"]
 }
