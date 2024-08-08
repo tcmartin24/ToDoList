@@ -101,7 +101,7 @@ jobs:
           echo "pwd"
           pwd
           echo "list files in cwd"
-          list -l
+          ls -l
           echo "Building image..."
           docker build -t todo-list-react:latest -f ./Dockerfile .
           echo "Tagging image..."
