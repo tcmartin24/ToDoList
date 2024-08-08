@@ -99,7 +99,7 @@ jobs:
 #            echo "where is npm?"
 #            whereis npm
             npm install
-          working-directory: ./todo-list-react
+        working-directory: ./todo-list-react
           
       - name: Build and push todo-list-react Docker image
         run: |
