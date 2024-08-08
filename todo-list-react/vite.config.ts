@@ -15,6 +15,11 @@ export default defineConfig(({ command, mode }) => {
       globals: true,
       environment: 'jsdom',
       setupFiles: './setupTests.ts',
+      css: true,
+      coverage: {
+        provider: 'istanbul',
+        reporter: ['text', 'json', 'html'],
+      },
     },
     server: useProxy ? {
       proxy: {
