@@ -98,9 +98,14 @@ jobs:
           
       - name: Build and push todo-list-react Docker image
         run: |
+          echo "pwd"
+          pwd
+          echo "list files in cwd"
+          list -l
           echo "Building image..."
-          docker build -t todo-list-react:latest -f ./todo-list-react/Dockerfile .
+          docker build -t todo-list-react:latest -f ./Dockerfile .
           echo "Tagging image..."
           docker tag todo-list-react:latest ${ACR_LOGIN_SERVER}/todo-list-react:latest
           echo "Pushing image..."
           docker push ${ACR_LOGIN_SERVER}/todo-list-react:latest
+        working-directory: ./todo-list-react
