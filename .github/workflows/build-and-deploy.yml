@@ -92,12 +92,12 @@ jobs:
 #          docker push ${ACR_LOGIN_SERVER}/todolist-api:latest
 
       - name: Ensure package-lock.json is generated
-          run: |
-            echo "pwd..."
-            pwd
-            find ./
-            echo "where is npm?"
-            whereis npm
+        run: |
+#            echo "pwd..."
+#            pwd
+#            find ./
+#            echo "where is npm?"
+#            whereis npm
             npm install
           working-directory: ./todo-list-react
           
