@@ -29,7 +29,7 @@ const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAddOrUpdate, isLoading, edi
         if (title.trim() === '') return;
 
         onAddOrUpdate({ 
-            id: editingTodo ? editingTodo.id : undefined, 
+            id: editingTodo ? editingTodo.id : 0, 
             title: title, 
             isComplete: isComplete 
         });
