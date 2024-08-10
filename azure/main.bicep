@@ -1,4 +1,5 @@
 param location string = resourceGroup().location
+param sqlServerLocation string = 'eastus2'  // or any other available region
 param environment string = 'dev'
 param appName string = 'todolist'
 param tenantId string = tenant().tenantId
@@ -66,7 +67,7 @@ resource secret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
 
 resource sqlServer 'Microsoft.Sql/servers@2021-11-01-preview' = {
   name: sqlServerName
-  location: location
+  location: sqlServerLocation
   properties: {
     administratorLogin: adminUsername
     administratorLoginPassword: generatePassword.properties.outputs.password
@@ -80,7 +81,7 @@ resource sqlServer 'Microsoft.Sql/servers@2021-11-01-preview' = {
 resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
   parent: sqlServer
   name: sqlDBName
-  location: location
+  location: sqlServerLocation
   sku: {
     name: 'GP_S_Gen5'
     tier: 'GeneralPurpose'
