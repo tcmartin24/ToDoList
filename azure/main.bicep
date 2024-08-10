@@ -4,8 +4,8 @@ param appName string = 'todolist'
 param tenantId string = tenant().tenantId
 param objectId string
 
-var kvName = 'kv-${appName}-${environment}-${uniqueString(resourceGroup().id)}'
-var sqlServerName = 'sql-${appName}-${environment}-${uniqueString(resourceGroup().id)}'
+var kvName = 'kv-${appName}-${environment}-${uniqueString(resourceGroup().id, 5)}'
+var sqlServerName = 'sql-${appName}-${environment}-${uniqueString(resourceGroup().id, 5)}'
 var sqlDBName = '${appName}-db'
 var adminUsername = 'sqladmin'
 
