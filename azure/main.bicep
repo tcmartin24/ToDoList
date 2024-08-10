@@ -5,7 +5,7 @@ param tenantId string = tenant().tenantId
 param objectId string
 
 var kvName = 'kv-${appName}-${environment}-${substring(uniqueString(resourceGroup().id), 0, 5)}'
-var sqlServerName = 'sql-${appName}-${environment}-${substring(uniqueString(resourceGroup().id), 0, 5)'
+var sqlServerName = 'sql-${appName}-${environment}-${substring(uniqueString(resourceGroup().id), 0, 5)}'
 var sqlDBName = '${appName}-db'
 var adminUsername = 'sqladmin'
 
