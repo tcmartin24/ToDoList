@@ -18,7 +18,7 @@ resource generatePassword 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
     retentionInterval: 'PT1H'
     scriptContent: '''
       password=$(openssl rand -base64 24)
-      echo "{\\"password\\":\\"$password\\"}" > $AZ_SCRIPTS_OUTPUT_PATH
+      echo "{\"password\":\"$password\"}" > $AZ_SCRIPTS_OUTPUT_PATH
     '''
     cleanupPreference: 'Always'
   }
