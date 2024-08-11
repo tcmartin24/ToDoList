@@ -189,15 +189,15 @@ resource sqlServerFirewallRules 'Microsoft.Sql/servers/firewallRules@2021-11-01-
   }
 }
 
-output webAppName string = webApp.name
-output keyVaultName string = keyVault.name
-output sqlServerName string = sqlServer.name
-output sqlDatabaseName string = sqlDatabase.name
-output sqlServerFqdn string = sqlServer.properties.fullyQualifiedDomainName
+output webAppName string = 'my-val-${webApp.name}'
+output keyVaultName string = 'my-val-${keyVault.name}'
+output sqlServerName string = 'my-val-${sqlServer.name}'
+output sqlDatabaseName string = 'my-val-${sqlDatabase.name}'
+output sqlServerFqdn string = 'my-val-${sqlServer.properties.fullyQualifiedDomainName}'
 
-output val1 string = webApp.name
-output val2 string = keyVault.name
-output val3 string = sqlServer.name
-output val4 string = sqlDatabase.name
-output val5 string = sqlServer.properties.fullyQualifiedDomainName
+output val1 string = 'my-val-${webApp.name}'
+output val2 string = 'my-val-${keyVault.name}'
+output val3 string = 'my-val-${sqlServer.name}'
+output val4 string = 'my-val-${sqlDatabase.name}'
+output val5 string = 'my-val-${sqlServer.properties.fullyQualifiedDomainName}'
 output myTestValue string = 'apples_are_red'
