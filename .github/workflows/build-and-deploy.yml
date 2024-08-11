@@ -185,13 +185,13 @@ jobs:
           echo "sql_server_name=${{ steps.bicep-deploy.outputs.sqlServerName }}" >> $GITHUB_OUTPUT
           echo "sql_database_name=${{ steps.bicep-deploy.outputs.sqlDatabaseName }}" >> $GITHUB_OUTPUT
           echo "my_test_value=${{ steps.bicep-deploy.outputs.myTestValue }}" >> $GITHUB_OUTPUT
-        outputs:
-          webapp_name: ${{ steps.bicep-deploy.outputs.webAppName }}
-          keyvault_name: ${{ steps.bicep-deploy.outputs.keyVaultName }}
-          sql_server_name: ${{ steps.bicep-deploy.outputs.sqlServerName }}
-          sql_database_name: ${{ steps.bicep-deploy.outputs.sqlDatabaseName }}
-          my_test_value: ${{ steps.bicep-deploy.outputs.myTestValue }}
-          test_value: "This is my test value"
+    outputs:
+      webapp_name: ${{ steps.bicep-deploy.outputs.webAppName }}
+      keyvault_name: ${{ steps.bicep-deploy.outputs.keyVaultName }}
+      sql_server_name: ${{ steps.bicep-deploy.outputs.sqlServerName }}
+      sql_database_name: ${{ steps.bicep-deploy.outputs.sqlDatabaseName }}
+      my_test_value: ${{ steps.bicep-deploy.outputs.myTestValue }}
+      test_value: "This is my test value"
 
 
   deploy-application:
