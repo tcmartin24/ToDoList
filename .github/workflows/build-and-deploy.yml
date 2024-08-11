@@ -187,8 +187,28 @@ jobs:
 
       - name: Update Azure Web App with New Images
         run: |
-          az webapp config container set --name ${{ secrets.AZURE_WEBAPP_NAME }} \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --docker-custom-image-name frontend=${{ env.ACR_LOGIN_SERVER }}/todo-list-react:latest \
-            --docker-custom-image-name backend=${{ env.ACR_LOGIN_SERVER }}/todolist-api:latest \
-            --docker-registry-server-url https://${{ env.ACR_LOGIN_SERVER }}
+          WEBAPP_NAME="${{ secrets.AZURE_WEBAPP_NAME }}"
+          RESOURCE_GROUP="${{ secrets.AZURE_RESOURCE_GROUP }}"
+          ACR_LOGIN_SERVER="${{ env.ACR_LOGIN_SERVER }}"
+          
+          CONTAINER_CONFIG=$(cat << EOF
+          [
+            {
+              "name": "frontend",
+              "image": "${ACR_LOGIN_SERVER}/todo-list-react:latest"
+            },
+            {
+              "name": "backend",
+              "image": "${ACR_LOGIN_SERVER}/todolist-api:latest"
+            }
+          ]
+          EOF
+          )
+
+          ENCODED_CONFIG=$(echo "$CONTAINER_CONFIG" | base64 -w 0)
+          
+          az webapp config container set \
+            --name "$WEBAPP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --multicontainer-config-type COMPOSE \
+            --multicontainer-config-file "$ENCODED_CONFIG"
