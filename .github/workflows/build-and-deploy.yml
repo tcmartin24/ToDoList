@@ -138,6 +138,7 @@ jobs:
           mv /tmp/.buildx-cache-react-new /tmp/.buildx-cache-react
 
   deploy-infrastructure:
+    needs: package-and-push  # Ensures this runs after package-and-push
     runs-on: ubuntu-latest
     outputs:
       webapp_name: ${{ steps.bicep-deploy.outputs.webAppName }}
@@ -187,6 +188,13 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Echo received outputs
+        run: |
+          echo "Received Web App Name: ${{ needs.deploy-infrastructure.outputs.webapp_name }}"
+          echo "Received Key Vault Name: ${{ needs.deploy-infrastructure.outputs.keyvault_name }}"
+          echo "Received SQL Server Name: ${{ needs.deploy-infrastructure.outputs.sql_server_name }}"
+          echo "Received SQL Database Name: ${{ needs.deploy-infrastructure.outputs.sql_database_name }}"
 
       - name: Log in to Azure Container Registry
         run: az acr login --name ${{ env.ACR_NAME }}
