@@ -139,6 +139,11 @@ jobs:
 
   deploy-infrastructure:
     runs-on: ubuntu-latest
+    outputs:
+      webapp_name: ${{ steps.bicep-deploy.outputs.webAppName }}
+      keyvault_name: ${{ steps.bicep-deploy.outputs.keyVaultName }}
+      sql_server_name: ${{ steps.bicep-deploy.outputs.sqlServerName }}
+      sql_database_name: ${{ steps.bicep-deploy.outputs.sqlDatabaseName }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -164,19 +169,12 @@ jobs:
             acrPassword=${{ secrets.ACR_PASSWORD }}
           failOnStdErr: false
 
-      - name: Set global environment variables
-        run: |
-          echo "WEBAPP_NAME=${{ steps.bicep-deploy.outputs.webAppName }}" >> $GITHUB_ENV
-          echo "KEYVAULT_NAME=${{ steps.bicep-deploy.outputs.keyVaultName }}" >> $GITHUB_ENV
-          echo "SQL_SERVER_NAME=${{ steps.bicep-deploy.outputs.sqlServerName }}" >> $GITHUB_ENV
-          echo "SQL_DATABASE_NAME=${{ steps.bicep-deploy.outputs.sqlDatabaseName }}" >> $GITHUB_ENV
-          
       - name: Output Bicep deployment results
         run: |
-          echo "Web App Name: ${{ env.WEBAPP_NAME }}"
-          echo "Key Vault Name: ${{ env.KEYVAULT_NAME }}"
-          echo "SQL Server Name: ${{ env.SQL_SERVER_NAME }}"
-          echo "SQL Database Name: ${{ env.SQL_DATABASE_NAME }}"
+          echo "Web App Name: ${{ steps.bicep-deploy.outputs.webAppName }}"
+          echo "Key Vault Name: ${{ steps.bicep-deploy.outputs.keyVaultName }}"
+          echo "SQL Server Name: ${{ steps.bicep-deploy.outputs.sqlServerName }}"
+          echo "SQL Database Name: ${{ steps.bicep-deploy.outputs.sqlDatabaseName }}"
 
   deploy-application:
     needs: deploy-infrastructure
@@ -199,10 +197,10 @@ jobs:
 
       - name: Debug - Check Web App Existence
         run: |
-          if az webapp show --name "${{ env.WEBAPP_NAME }}" --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} &>/dev/null; then
-            echo "Web App ${{ env.WEBAPP_NAME }} exists"
+          if az webapp show --name "${{ needs.deploy-infrastructure.outputs.webapp_name }}" --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} &>/dev/null; then
+            echo "Web App ${{ needs.deploy-infrastructure.outputs.webapp_name }} exists"
           else
-            echo "Web App ${{ env.WEBAPP_NAME }} does not exist"
+            echo "Web App ${{ needs.deploy-infrastructure.outputs.webapp_name }} does not exist"
             echo "Available Web Apps:"
             az webapp list --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --query "[].name" -o tsv
           fi
@@ -211,8 +209,9 @@ jobs:
         run: |
           RESOURCE_GROUP="${{ secrets.AZURE_RESOURCE_GROUP }}"
           ACR_LOGIN_SERVER="${{ env.ACR_LOGIN_SERVER }}"
+          WEBAPP_NAME="${{ needs.deploy-infrastructure.outputs.webapp_name }}"
           
-          echo "Updating Web App: ${{ env.WEBAPP_NAME }}"
+          echo "Updating Web App: $WEBAPP_NAME"
           echo "Resource Group: $RESOURCE_GROUP"
           
           # Create the multi-container config
@@ -235,7 +234,7 @@ jobs:
           
           # Update the web app configuration
           az webapp config container set \
-            --name "${{ env.WEBAPP_NAME }}" \
+            --name "$WEBAPP_NAME" \
             --resource-group "$RESOURCE_GROUP" \
             --multicontainer-config-type COMPOSE \
             --multicontainer-config-file "$ENCODED_CONFIG"
@@ -243,4 +242,4 @@ jobs:
       - name: Verify Web App Configuration
         run: |
           echo "Fetching Web App configuration..."
-          az webapp config container show --name "${{ env.WEBAPP_NAME }}" --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}"
+          az webapp config container show --name "${{ needs.deploy-infrastructure.outputs.webapp_name }}" --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}"
