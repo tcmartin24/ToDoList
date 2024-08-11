@@ -191,6 +191,11 @@ jobs:
       sql_server_name: ${{ steps.bicep-deploy.outputs.val3 }}
       sql_database_name: ${{ steps.bicep-deploy.outputs.val4 }}
       my_test_value: ${{ steps.bicep-deploy.outputs.myTestValue }}
+      my_test_value_1: ${{ steps.bicep-deploy.outputs.val1 }}
+      my_test_value_2: ${{ steps.bicep-deploy.outputs.val2 }}
+      my_test_value_3: ${{ steps.bicep-deploy.outputs.val3 }}
+      my_test_value_4: ${{ steps.bicep-deploy.outputs.val4 }}
+      my_test_value: ${{ steps.bicep-deploy.outputs.myTestValue }}
       test_value: "This is my test value"
 
   deploy-application:
@@ -207,10 +212,10 @@ jobs:
 
       - name: Echo received outputs
         run: |
-          echo "Received Web App Name: '${{ needs.deploy-infrastructure.outputs.webapp_name }}'"
-          echo "Received Key Vault Name: '${{ needs.deploy-infrastructure.outputs.keyvault_name }}'"
-          echo "Received SQL Server Name: '${{ needs.deploy-infrastructure.outputs.sql_server_name }}'"
-          echo "Received SQL Database Name: '${{ needs.deploy-infrastructure.outputs.sql_database_name }}'"
+          echo "Received Web App Name: '${{ needs.deploy-infrastructure.outputs.my_test_value_1 }}'"
+          echo "Received Key Vault Name: '${{ needs.deploy-infrastructure.outputs.my_test_value_2 }}'"
+          echo "Received SQL Server Name: '${{ needs.deploy-infrastructure.outputs.my_test_value_3 }}'"
+          echo "Received SQL Database Name: '${{ needs.deploy-infrastructure.outputs.my_test_value_4 }}'"
           echo "My Test Value1: '${{ needs.deploy-infrastructure.outputs.my_test_value }}'"
           echo "My Test Value: '${{ needs.deploy-infrastructure.outputs.test_value }}'"
           
