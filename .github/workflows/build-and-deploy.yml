@@ -189,6 +189,22 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Debug - List Web Apps
+        run: |
+          az webapp list --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --query "[].name" -o tsv
+
+      - name: Debug - Check Web App Existence
+        env:
+          WEBAPP_NAME: ${{ needs.deploy-infrastructure.outputs.webAppName }}
+        run: |
+          if az webapp show --name "$WEBAPP_NAME" --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} &>/dev/null; then
+            echo "Web App $WEBAPP_NAME exists"
+          else
+            echo "Web App $WEBAPP_NAME does not exist"
+            echo "Available Web Apps:"
+            az webapp list --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --query "[].name" -o tsv
+          fi
+
       - name: Log in to Azure Container Registry
         run: az acr login --name ${{ env.ACR_NAME }}
 
@@ -198,6 +214,9 @@ jobs:
         run: |
           RESOURCE_GROUP="${{ secrets.AZURE_RESOURCE_GROUP }}"
           ACR_LOGIN_SERVER="${{ env.ACR_LOGIN_SERVER }}"
+          
+          echo "Updating Web App: $WEBAPP_NAME"
+          echo "Resource Group: $RESOURCE_GROUP"
           
           # Create the multi-container config
           CONTAINER_CONFIG=$(cat << EOF
