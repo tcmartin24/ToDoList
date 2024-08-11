@@ -190,11 +190,11 @@ resource sqlServerFirewallRules 'Microsoft.Sql/servers/firewallRules@2021-11-01-
 }
 
 // Capture resource properties into global variables
-var webAppNameVar = webApp.name
-var keyVaultNameVar = keyVault.name
-var sqlServerNameVar = sqlServer.name
-var sqlDatabaseNameVar = sqlDatabase.name
-var sqlServerFqdnVar = sqlServer.properties.fullyQualifiedDomainName
+var webAppNameVar = base64(webApp.name)
+var keyVaultNameVar = base64(keyVault.name)
+var sqlServerNameVar = base64(sqlServer.name)
+var sqlDatabaseNameVar = base64(sqlDatabase.name)
+var sqlServerFqdnVar = base64(sqlServer.properties.fullyQualifiedDomainName)
 
 // Outputs without prefixes
 output webAppName string = webAppNameVar
