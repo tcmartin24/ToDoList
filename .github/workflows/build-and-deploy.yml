@@ -190,7 +190,6 @@ jobs:
       keyvault_name: ${{ steps.bicep-deploy.outputs.val2 }}
       sql_server_name: ${{ steps.bicep-deploy.outputs.val3 }}
       sql_database_name: ${{ steps.bicep-deploy.outputs.val4 }}
-      my_test_value: ${{ steps.bicep-deploy.outputs.myTestValue }}
       my_test_value_1: ${{ steps.bicep-deploy.outputs.val1 }}
       my_test_value_2: ${{ steps.bicep-deploy.outputs.val2 }}
       my_test_value_3: ${{ steps.bicep-deploy.outputs.val3 }}
