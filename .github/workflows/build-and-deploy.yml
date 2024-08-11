@@ -202,11 +202,11 @@ jobs:
 
       - name: Decode and Echo received outputs
         run: |
-          decoded_webapp_name=$(echo ${{ needs.deploy-infrastructure.outputs.webapp_name }} | base64 --decode)
-          decoded_keyvault_name=$(echo ${{ needs.deploy-infrastructure.outputs.keyvault_name }} | base64 --decode)
-          decoded_sql_server_name=$(echo ${{ needs.deploy-infrastructure.outputs.sql_server_name }} | base64 --decode)
-          decoded_sql_database_name=$(echo ${{ needs.deploy-infrastructure.outputs.sql_database_name }} | base64 --decode)
-          decoded_my_test_value=$(echo ${{ needs.deploy-infrastructure.outputs.my_test_value }} | base64 --decode)
+          decoded_webapp_name=$(echo "${{ needs.deploy-infrastructure.outputs.webapp_name }}" | base64 --decode)
+          decoded_keyvault_name=$(echo "${{ needs.deploy-infrastructure.outputs.keyvault_name }}" | base64 --decode)
+          decoded_sql_server_name=$(echo "${{ needs.deploy-infrastructure.outputs.sql_server_name }}" | base64 --decode)
+          decoded_sql_database_name=$(echo "${{ needs.deploy-infrastructure.outputs.sql_database_name }}" | base64 --decode)
+          decoded_my_test_value=$(echo "${{ needs.deploy-infrastructure.outputs.my_test_value }}" | base64 --decode)
           
           echo "Received Web App Name: '$decoded_webapp_name'"
           echo "Received Key Vault Name: '$decoded_keyvault_name'"
