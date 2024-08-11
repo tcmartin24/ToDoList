@@ -189,8 +189,8 @@ resource sqlServerFirewallRules 'Microsoft.Sql/servers/firewallRules@2021-11-01-
   }
 }
 
+output webAppName string = webApp.name
 output keyVaultName string = keyVault.name
 output sqlServerName string = sqlServer.name
 output sqlDatabaseName string = sqlDatabase.name
-output webAppName string = webApp.name
 output sqlServerFqdn string = sqlServer.properties.fullyQualifiedDomainName

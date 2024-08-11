@@ -140,6 +140,11 @@ jobs:
   deploy-infrastructure:
     needs: package-and-push
     runs-on: ubuntu-latest
+    outputs:
+      webAppName: ${{ steps.bicep-deploy.outputs.webAppName }}
+      keyVaultName: ${{ steps.bicep-deploy.outputs.keyVaultName }}
+      sqlServerName: ${{ steps.bicep-deploy.outputs.sqlServerName }}
+      sqlDatabaseName: ${{ steps.bicep-deploy.outputs.sqlDatabaseName }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -150,6 +155,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Deploy Bicep template
+        id: bicep-deploy
         uses: azure/arm-deploy@v1
         with:
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -166,6 +172,7 @@ jobs:
 
       - name: Output Bicep deployment results
         run: |
+          echo "Web App Name: ${{ steps.bicep-deploy.outputs.webAppName }}"
           echo "Key Vault Name: ${{ steps.bicep-deploy.outputs.keyVaultName }}"
           echo "SQL Server Name: ${{ steps.bicep-deploy.outputs.sqlServerName }}"
           echo "SQL Database Name: ${{ steps.bicep-deploy.outputs.sqlDatabaseName }}"
@@ -186,11 +193,13 @@ jobs:
         run: az acr login --name ${{ env.ACR_NAME }}
 
       - name: Update Azure Web App with New Images
+        env:
+          WEBAPP_NAME: ${{ needs.deploy-infrastructure.outputs.webAppName }}
         run: |
-          WEBAPP_NAME="${{ secrets.AZURE_WEBAPP_NAME }}"
           RESOURCE_GROUP="${{ secrets.AZURE_RESOURCE_GROUP }}"
           ACR_LOGIN_SERVER="${{ env.ACR_LOGIN_SERVER }}"
           
+          # Create the multi-container config
           CONTAINER_CONFIG=$(cat << EOF
           [
             {
@@ -205,10 +214,21 @@ jobs:
           EOF
           )
 
+          # Encode the config to base64
           ENCODED_CONFIG=$(echo "$CONTAINER_CONFIG" | base64 -w 0)
           
+          # Update the web app configuration
           az webapp config container set \
             --name "$WEBAPP_NAME" \
             --resource-group "$RESOURCE_GROUP" \
             --multicontainer-config-type COMPOSE \
             --multicontainer-config-file "$ENCODED_CONFIG"
+
+      - name: Verify Web App Configuration
+        env:
+          WEBAPP_NAME: ${{ needs.deploy-infrastructure.outputs.webAppName }}
+        run: |
+          RESOURCE_GROUP="${{ secrets.AZURE_RESOURCE_GROUP }}"
+          
+          echo "Fetching Web App configuration..."
+          az webapp config container show --name "$WEBAPP_NAME" --resource-group "$RESOURCE_GROUP"
