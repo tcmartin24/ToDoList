@@ -10,8 +10,6 @@ param acrUsername string
 @secure()
 param acrPassword string
 
-
-
 var kvName = 'kv-${appName}-${environment}-${substring(uniqueString(resourceGroup().id), 0, 5)}'
 var sqlServerName = 'sql-${appName}-${environment}-${substring(uniqueString(resourceGroup().id), 0, 5)}'
 var sqlDBName = '${appName}-db'
@@ -182,19 +180,22 @@ resource webApp 'Microsoft.Web/sites@2021-03-01' = {
   }
 }
 
-resource webAppConfig 'Microsoft.Web/sites/config@2021-03-01' existing = {
+resource webAppNetworkConfig 'Microsoft.Web/sites/networkConfig@2021-03-01' = {
   parent: webApp
-  name: 'web'
+  name: 'virtualNetwork'
+  properties: {
+    subnetResourceId: ''
+  }
 }
 
-resource sqlServerWebAppFirewallRules 'Microsoft.Sql/servers/firewallRules@2021-11-01-preview' = [for ip in split(webAppConfig.properties.outboundIpAddresses, ','): {
+resource sqlServerFirewallRules 'Microsoft.Sql/servers/firewallRules@2021-11-01-preview' = {
   parent: sqlServer
-  name: 'AllowWebApp_${ip}'
+  name: 'AllowAllWindowsAzureIps'
   properties: {
-    startIpAddress: ip
-    endIpAddress: ip
+    startIpAddress: '0.0.0.0'
+    endIpAddress: '0.0.0.0'
   }
-}]
+}
 
 output keyVaultName string = keyVault.name
 output sqlServerName string = sqlServer.name
