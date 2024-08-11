@@ -177,11 +177,20 @@ jobs:
           echo "Key Vault Name: '${{ steps.bicep-deploy.outputs.keyVaultName }}'"
           echo "SQL Server Name: '${{ steps.bicep-deploy.outputs.sqlServerName }}'"
           echo "SQL Database Name: '${{ steps.bicep-deploy.outputs.sqlDatabaseName }}'"
+          
+      - name: Create environment vars of bicep outputs
+        run: |
+          echo "webapp_name=${{ steps.bicep-deploy.outputs.webAppName }}" >> $GITHUB_OUTPUT
+          echo "keyvault_name=${{ steps.bicep-deploy.outputs.keyVaultName }}" >> $GITHUB_OUTPUT
+          echo "sql_server_name=${{ steps.bicep-deploy.outputs.sqlServerName }}" >> $GITHUB_OUTPUT
+          echo "sql_database_name=${{ steps.bicep-deploy.outputs.sqlDatabaseName }}" >> $GITHUB_OUTPUT
+          echo "my_test_value=${{ steps.bicep-deploy.outputs.myTestValue }}" >> $GITHUB_OUTPUT
     outputs:
       webapp_name: ${{ steps.bicep-deploy.outputs.webAppName }}
       keyvault_name: ${{ steps.bicep-deploy.outputs.keyVaultName }}
       sql_server_name: ${{ steps.bicep-deploy.outputs.sqlServerName }}
       sql_database_name: ${{ steps.bicep-deploy.outputs.sqlDatabaseName }}
+      my_test_value: ${{ steps.bicep-deploy.outputs.myTestValue }}
       test_value: "This is my test value"
 
   deploy-application:
@@ -199,6 +208,15 @@ jobs:
       - name: Echo received outputs
         run: |
           echo "Received Web App Name: '${{ needs.deploy-infrastructure.outputs.webapp_name }}'"
+          echo "Received Key Vault Name: '${{ needs.deploy-infrastructure.outputs.keyvault_name }}'"
+          echo "Received SQL Server Name: '${{ needs.deploy-infrastructure.outputs.sql_server_name }}'"
+          echo "Received SQL Database Name: '${{ needs.deploy-infrastructure.outputs.sql_database_name }}'"
+          echo "My Test Value1: '${{ needs.deploy-infrastructure.outputs.my_test_value }}'"
+          echo "My Test Value: '${{ needs.deploy-infrastructure.outputs.test_value }}'"
+          
+        - name: Echo received env vars from previous job
+        run: |
+          echo "Received Web App Name: '${{ webapp_name }}'"
           echo "Received Key Vault Name: '${{ needs.deploy-infrastructure.outputs.keyvault_name }}'"
           echo "Received SQL Server Name: '${{ needs.deploy-infrastructure.outputs.sql_server_name }}'"
           echo "Received SQL Database Name: '${{ needs.deploy-infrastructure.outputs.sql_database_name }}'"

@@ -194,3 +194,4 @@ output keyVaultName string = keyVault.name
 output sqlServerName string = sqlServer.name
 output sqlDatabaseName string = sqlDatabase.name
 output sqlServerFqdn string = sqlServer.properties.fullyQualifiedDomainName
+output myTestValue string = 'apples_are_red'
