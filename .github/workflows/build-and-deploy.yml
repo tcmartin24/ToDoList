@@ -149,6 +149,12 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Output Before Bicep deployment results
+        run: |
+          echo "Web App Name: '${{ steps.bicep-deploy.outputs.webAppName }}'"
+          echo "Key Vault Name: '${{ steps.bicep-deploy.outputs.keyVaultName }}'"
+          echo "SQL Server Name: '${{ steps.bicep-deploy.outputs.sqlServerName }}'"
+          echo "SQL Database Name: '${{ steps.bicep-deploy.outputs.sqlDatabaseName }}'"    
       - name: Deploy Bicep template
         id: bicep-deploy
         uses: azure/arm-deploy@v1
@@ -165,17 +171,17 @@ jobs:
             acrPassword=${{ secrets.ACR_PASSWORD }}
           failOnStdErr: false
 
-      - name: Output Bicep deployment results
+      - name: Output AFTER Bicep deployment results
         run: |
           echo "Web App Name: '${{ steps.bicep-deploy.outputs.webAppName }}'"
           echo "Key Vault Name: '${{ steps.bicep-deploy.outputs.keyVaultName }}'"
           echo "SQL Server Name: '${{ steps.bicep-deploy.outputs.sqlServerName }}'"
           echo "SQL Database Name: '${{ steps.bicep-deploy.outputs.sqlDatabaseName }}'"
     outputs:
-      webapp_name: "${{ steps.bicep-deploy.outputs.webAppName }}"
-      keyvault_name: "${{ steps.bicep-deploy.outputs.keyVaultName }}"
-      sql_server_name: "${{ steps.bicep-deploy.outputs.sqlServerName }}"
-      sql_database_name: "${{ steps.bicep-deploy.outputs.sqlDatabaseName }}"
+      webapp_name: ${{ steps.bicep-deploy.outputs.webAppName }}
+      keyvault_name: ${{ steps.bicep-deploy.outputs.keyVaultName }}
+      sql_server_name: ${{ steps.bicep-deploy.outputs.sqlServerName }}
+      sql_database_name: ${{ steps.bicep-deploy.outputs.sqlDatabaseName }}
       test_value: "This is my test value"
 
   deploy-application:
