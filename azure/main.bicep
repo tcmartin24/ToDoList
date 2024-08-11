@@ -189,15 +189,17 @@ resource sqlServerFirewallRules 'Microsoft.Sql/servers/firewallRules@2021-11-01-
   }
 }
 
-output webAppName string = 'my-val-${webApp.name}'
-output keyVaultName string = 'my-val-${keyVault.name}'
-output sqlServerName string = 'my-val-${sqlServer.name}'
-output sqlDatabaseName string = 'my-val-${sqlDatabase.name}'
-output sqlServerFqdn string = 'my-val-${sqlServer.properties.fullyQualifiedDomainName}'
+// Capture resource properties into global variables
+var webAppNameVar = webApp.name
+var keyVaultNameVar = keyVault.name
+var sqlServerNameVar = sqlServer.name
+var sqlDatabaseNameVar = sqlDatabase.name
+var sqlServerFqdnVar = sqlServer.properties.fullyQualifiedDomainName
 
-output val1 string = 'my-val-${webApp.name}'
-output val2 string = 'my-val-${keyVault.name}'
-output val3 string = 'my-val-${sqlServer.name}'
-output val4 string = 'my-val-${sqlDatabase.name}'
-output val5 string = 'my-val-${sqlServer.properties.fullyQualifiedDomainName}'
+// Outputs without prefixes
+output webAppName string = webAppNameVar
+output keyVaultName string = keyVaultNameVar
+output sqlServerName string = sqlServerNameVar
+output sqlDatabaseName string = sqlDatabaseNameVar
+output sqlServerFqdn string = sqlServerFqdnVar
 output myTestValue string = 'apples_are_red'
