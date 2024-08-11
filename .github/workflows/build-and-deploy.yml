@@ -171,26 +171,28 @@ jobs:
             acrPassword=${{ secrets.ACR_PASSWORD }}
           failOnStdErr: false
 
+      - name: Decode Base64 encoded outputs
+        id: decode-outputs
+        run: |
+          echo "webapp_name=$(echo '${{ steps.bicep-deploy.outputs.webAppName }}' | base64 --decode)" >> $GITHUB_ENV
+          echo "keyvault_name=$(echo '${{ steps.bicep-deploy.outputs.keyVaultName }}' | base64 --decode)" >> $GITHUB_ENV
+          echo "sql_server_name=$(echo '${{ steps.bicep-deploy.outputs.sqlServerName }}' | base64 --decode)" >> $GITHUB_ENV
+          echo "sql_database_name=$(echo '${{ steps.bicep-deploy.outputs.sqlDatabaseName }}' | base64 --decode)" >> $GITHUB_ENV
+          echo "my_test_value=$(echo '${{ steps.bicep-deploy.outputs.myTestValue }}' | base64 --decode)" >> $GITHUB_ENV
+
       - name: Output AFTER Bicep deployment results
         run: |
-          echo "Web App Name: '${{ steps.bicep-deploy.outputs.webAppName }}'"
-          echo "Key Vault Name: '${{ steps.bicep-deploy.outputs.keyVaultName }}'"
-          echo "SQL Server Name: '${{ steps.bicep-deploy.outputs.sqlServerName }}'"
-          echo "SQL Database Name: '${{ steps.bicep-deploy.outputs.sqlDatabaseName }}'"
+          echo "Web App Name: '${{ env.webapp_name }}'"
+          echo "Key Vault Name: '${{ env.keyvault_name }}'"
+          echo "SQL Server Name: '${{ env.sql_server_name }}'"
+          echo "SQL Database Name: '${{ env.sql_database_name }}'"
           
-      - name: Create environment vars of bicep outputs
-        run: |
-          echo "webapp_name=${{ steps.bicep-deploy.outputs.webAppName }}" >> $GITHUB_OUTPUT
-          echo "keyvault_name=${{ steps.bicep-deploy.outputs.keyVaultName }}" >> $GITHUB_OUTPUT
-          echo "sql_server_name=${{ steps.bicep-deploy.outputs.sqlServerName }}" >> $GITHUB_OUTPUT
-          echo "sql_database_name=${{ steps.bicep-deploy.outputs.sqlDatabaseName }}" >> $GITHUB_OUTPUT
-          echo "my_test_value=${{ steps.bicep-deploy.outputs.myTestValue }}" >> $GITHUB_OUTPUT
     outputs:
-      webapp_name: ${{ steps.bicep-deploy.outputs.webAppName }}
-      keyvault_name: ${{ steps.bicep-deploy.outputs.keyVaultName }}
-      sql_server_name: ${{ steps.bicep-deploy.outputs.sqlServerName }}
-      sql_database_name: ${{ steps.bicep-deploy.outputs.sqlDatabaseName }}
-      my_test_value: ${{ steps.bicep-deploy.outputs.myTestValue }}
+      webapp_name: ${{ env.webapp_name }}
+      keyvault_name: ${{ env.keyvault_name }}
+      sql_server_name: ${{ env.sql_server_name }}
+      sql_database_name: ${{ env.sql_database_name }}
+      my_test_value: ${{ env.my_test_value }}
       test_value: "This is my test value"
 
 
