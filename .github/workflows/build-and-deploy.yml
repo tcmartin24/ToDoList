@@ -216,7 +216,7 @@ jobs:
           
       - name: Echo received env vars from previous job
         run: |
-          echo "Received Web App Name: '${{ webapp_name }}'"
+          echo "Received Web App Name: '${{ needs.deploy-infrastructure.outputs.webapp_name }}'"
           echo "Received Key Vault Name: '${{ needs.deploy-infrastructure.outputs.keyvault_name }}'"
           echo "Received SQL Server Name: '${{ needs.deploy-infrastructure.outputs.sql_server_name }}'"
           echo "Received SQL Database Name: '${{ needs.deploy-infrastructure.outputs.sql_database_name }}'"
