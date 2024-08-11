@@ -214,7 +214,7 @@ jobs:
           echo "My Test Value1: '${{ needs.deploy-infrastructure.outputs.my_test_value }}'"
           echo "My Test Value: '${{ needs.deploy-infrastructure.outputs.test_value }}'"
           
-        - name: Echo received env vars from previous job
+      - name: Echo received env vars from previous job
         run: |
           echo "Received Web App Name: '${{ webapp_name }}'"
           echo "Received Key Vault Name: '${{ needs.deploy-infrastructure.outputs.keyvault_name }}'"
