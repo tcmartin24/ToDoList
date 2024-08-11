@@ -180,14 +180,6 @@ resource webApp 'Microsoft.Web/sites@2021-03-01' = {
   }
 }
 
-resource webAppNetworkConfig 'Microsoft.Web/sites/networkConfig@2021-03-01' = {
-  parent: webApp
-  name: 'virtualNetwork'
-  properties: {
-    subnetResourceId: ''
-  }
-}
-
 resource sqlServerFirewallRules 'Microsoft.Sql/servers/firewallRules@2021-11-01-preview' = {
   parent: sqlServer
   name: 'AllowAllWindowsAzureIps'
