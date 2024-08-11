@@ -145,6 +145,7 @@ jobs:
       keyvault_name: ${{ steps.bicep-deploy.outputs.keyVaultName }}
       sql_server_name: ${{ steps.bicep-deploy.outputs.sqlServerName }}
       sql_database_name: ${{ steps.bicep-deploy.outputs.sqlDatabaseName }}
+      test_value: "This is my test value"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -172,10 +173,10 @@ jobs:
 
       - name: Output Bicep deployment results
         run: |
-          echo "Web App Name: ${{ steps.bicep-deploy.outputs.webAppName }}"
-          echo "Key Vault Name: ${{ steps.bicep-deploy.outputs.keyVaultName }}"
-          echo "SQL Server Name: ${{ steps.bicep-deploy.outputs.sqlServerName }}"
-          echo "SQL Database Name: ${{ steps.bicep-deploy.outputs.sqlDatabaseName }}"
+          echo "Web App Name: '${{ steps.bicep-deploy.outputs.webAppName }}'"
+          echo "Key Vault Name: '${{ steps.bicep-deploy.outputs.keyVaultName }}'"
+          echo "SQL Server Name: '${{ steps.bicep-deploy.outputs.sqlServerName }}'"
+          echo "SQL Database Name: '${{ steps.bicep-deploy.outputs.sqlDatabaseName }}'"
 
   deploy-application:
     needs: deploy-infrastructure
@@ -191,10 +192,11 @@ jobs:
 
       - name: Echo received outputs
         run: |
-          echo "Received Web App Name: ${{ needs.deploy-infrastructure.outputs.webapp_name }}"
-          echo "Received Key Vault Name: ${{ needs.deploy-infrastructure.outputs.keyvault_name }}"
-          echo "Received SQL Server Name: ${{ needs.deploy-infrastructure.outputs.sql_server_name }}"
-          echo "Received SQL Database Name: ${{ needs.deploy-infrastructure.outputs.sql_database_name }}"
+          echo "Received Web App Name: '${{ needs.deploy-infrastructure.outputs.webapp_name }}'"
+          echo "Received Key Vault Name: '${{ needs.deploy-infrastructure.outputs.keyvault_name }}'"
+          echo "Received SQL Server Name: '${{ needs.deploy-infrastructure.outputs.sql_server_name }}'"
+          echo "Received SQL Database Name: '${{ needs.deploy-infrastructure.outputs.sql_database_name }}'"
+          echo "My Test Value: '${{ needs.deploy-infrastructure.outputs.test_value }}'"
 
       - name: Log in to Azure Container Registry
         run: az acr login --name ${{ env.ACR_NAME }}
