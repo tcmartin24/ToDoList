@@ -4,11 +4,19 @@ param environment string = 'dev'
 param appName string = 'todolist'
 param tenantId string = tenant().tenantId
 param objectId string
+param acrLoginServer string
+param acrUsername string
+@secure()
+param acrPassword string
+
+
 
 var kvName = 'kv-${appName}-${environment}-${substring(uniqueString(resourceGroup().id), 0, 5)}'
 var sqlServerName = 'sql-${appName}-${environment}-${substring(uniqueString(resourceGroup().id), 0, 5)}'
 var sqlDBName = '${appName}-db'
 var adminUsername = 'sqladmin'
+var webAppName = '${appName}-${environment}-${substring(uniqueString(resourceGroup().id), 0, 5)}'
+var appServicePlanName = 'asp-${appName}-${environment}-${substring(uniqueString(resourceGroup().id), 0, 5)}'
 
 resource generatePassword 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   name: 'generatePassword'
@@ -100,6 +108,91 @@ resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
   }
 }
 
+resource appServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
+  name: appServicePlanName
+  location: location
+  sku: {
+    name: 'B1'
+    tier: 'Basic'
+  }
+  kind: 'linux'
+  properties: {
+    reserved: true
+  }
+}
+
+resource webApp 'Microsoft.Web/sites@2021-03-01' = {
+  name: webAppName
+  location: location
+  properties: {
+    serverFarmId: appServicePlan.id
+    siteConfig: {
+      appSettings: [
+        {
+          name: 'DOCKER_REGISTRY_SERVER_URL'
+          value: 'https://${acrLoginServer}'
+        }
+        {
+          name: 'DOCKER_REGISTRY_SERVER_USERNAME'
+          value: acrUsername
+        }
+        {
+          name: 'DOCKER_REGISTRY_SERVER_PASSWORD'
+          value: acrPassword
+        }
+        {
+          name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
+          value: 'false'
+        }
+        {
+          name: 'WEBSITE_VNET_ROUTE_ALL'
+          value: '1'
+        }
+        {
+          name: 'DB_SERVER'
+          value: sqlServer.properties.fullyQualifiedDomainName
+        }
+        {
+          name: 'DB_NAME'
+          value: sqlDBName
+        }
+        {
+          name: 'DB_USERNAME'
+          value: adminUsername
+        }
+        {
+          name: 'DB_PASSWORD'
+          value: '@Microsoft.KeyVault(SecretUri=${keyVault.properties.vaultUri}secrets/TodoListSqlAdminPassword)'
+        }
+      ]
+      linuxFxVersion: 'DOCKER|${fileBase64('multicontainer-config.txt')}'
+      alwaysOn: true
+      http20Enabled: true
+    }
+    httpsOnly: true
+  }
+  tags: {
+    app: appName
+    environment: environment
+  }
+}
+
+resource webAppIpAddresses 'Microsoft.Web/sites/config@2021-03-01' existing = {
+  parent: webApp
+  name: 'web'
+}
+
+resource sqlServerWebAppFirewallRules 'Microsoft.Sql/servers/firewallRules@2021-11-01-preview' = [for (ip, i) in split(webAppIpAddresses.properties.possibleOutboundIpAddresses, ','): {
+  parent: sqlServer
+  name: 'AllowWebApp_${i}'
+  properties: {
+    startIpAddress: ip
+    endIpAddress: ip
+  }
+}]
+
 output keyVaultName string = keyVault.name
 output sqlServerName string = sqlServer.name
 output sqlDatabaseName string = sqlDatabase.name
+output webAppName string = webApp.name
+output sqlServerFqdn string = sqlServer.properties.fullyQualifiedDomainName

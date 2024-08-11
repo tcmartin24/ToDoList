@@ -155,7 +155,13 @@ jobs:
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           resourceGroupName: ${{ secrets.AZURE_RESOURCE_GROUP }}
           template: ./azure/main.bicep
-          parameters: 'environment=dev appName=todolist objectId=${{ secrets.AZURE_AD_OBJECT_ID }}'
+          parameters: >
+            environment=dev 
+            appName=todolist 
+            objectId=${{ secrets.AZURE_AD_OBJECT_ID }}
+            acrLoginServer=${{ secrets.ACR_LOGIN_SERVER }}
+            acrUsername=${{ secrets.ACR_USERNAME }}
+            acrPassword=${{ secrets.ACR_PASSWORD }}
           failOnStdErr: false
 
       - name: Output Bicep deployment results
@@ -163,3 +169,26 @@ jobs:
           echo "Key Vault Name: ${{ steps.bicep-deploy.outputs.keyVaultName }}"
           echo "SQL Server Name: ${{ steps.bicep-deploy.outputs.sqlServerName }}"
           echo "SQL Database Name: ${{ steps.bicep-deploy.outputs.sqlDatabaseName }}"
+          
+  deploy-application:
+    needs: deploy-infrastructure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Log in to Azure Container Registry
+        run: az acr login --name ${{ env.ACR_NAME }}
+
+      - name: Update Azure Web App with New Images
+        run: |
+          az webapp config container set --name ${{ secrets.AZURE_WEBAPP_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --docker-custom-image-name frontend=${{ env.ACR_LOGIN_SERVER }}/todo-list-react:latest \
+            --docker-custom-image-name backend=${{ env.ACR_LOGIN_SERVER }}/todolist-api:latest \
+            --docker-registry-server-url https://${{ env.ACR_LOGIN_SERVER }}
