@@ -141,10 +141,10 @@ jobs:
     needs: package-and-push  # Ensures this runs after package-and-push
     runs-on: ubuntu-latest
     outputs:
-      webapp_name: ${{ steps.bicep-deploy.outputs.webAppName }}
-      keyvault_name: ${{ steps.bicep-deploy.outputs.keyVaultName }}
-      sql_server_name: ${{ steps.bicep-deploy.outputs.sqlServerName }}
-      sql_database_name: ${{ steps.bicep-deploy.outputs.sqlDatabaseName }}
+      webapp_name: "${{ steps.bicep-deploy.outputs.webAppName }}"
+      keyvault_name: "${{ steps.bicep-deploy.outputs.keyVaultName }}"
+      sql_server_name: "${{ steps.bicep-deploy.outputs.sqlServerName }}"
+      sql_database_name: "${{ steps.bicep-deploy.outputs.sqlDatabaseName }}"
       test_value: "This is my test value"
     steps:
       - name: Checkout repository
