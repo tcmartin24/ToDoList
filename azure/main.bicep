@@ -1,3 +1,4 @@
+param multiContainerConfigContent string = ''
 param location string = resourceGroup().location
 param sqlServerLocation string = 'eastus2'  // or any other available region
 param environment string = 'dev'
@@ -145,6 +146,10 @@ resource webApp 'Microsoft.Web/sites@2021-03-01' = {
           value: 'false'
         }
         {
+          name: 'DOCKER_ENABLE_CI'
+          value: 'true'
+        }
+        {
           name: 'WEBSITE_VNET_ROUTE_ALL'
           value: '1'
         }
@@ -165,7 +170,7 @@ resource webApp 'Microsoft.Web/sites@2021-03-01' = {
           value: '@Microsoft.KeyVault(SecretUri=${keyVault.properties.vaultUri}secrets/TodoListSqlAdminPassword)'
         }
       ]
-      linuxFxVersion: 'DOCKER|${fileBase64('multicontainer-config.txt')}'
+      linuxFxVersion: empty(multiContainerConfigContent) ? 'DOCKER|${acrLoginServer}/todo-list-react:latest' : 'COMPOSE|${multiContainerConfigContent}'
       alwaysOn: true
       http20Enabled: true
     }
@@ -177,14 +182,14 @@ resource webApp 'Microsoft.Web/sites@2021-03-01' = {
   }
 }
 
-resource webAppIpAddresses 'Microsoft.Web/sites/config@2021-03-01' existing = {
+resource webAppConfig 'Microsoft.Web/sites/config@2021-03-01' existing = {
   parent: webApp
   name: 'web'
 }
 
-resource sqlServerWebAppFirewallRules 'Microsoft.Sql/servers/firewallRules@2021-11-01-preview' = [for (ip, i) in split(webAppIpAddresses.properties.possibleOutboundIpAddresses, ','): {
+resource sqlServerWebAppFirewallRules 'Microsoft.Sql/servers/firewallRules@2021-11-01-preview' = [for ip in split(webAppConfig.properties.outboundIpAddresses, ','): {
   parent: sqlServer
-  name: 'AllowWebApp_${i}'
+  name: 'AllowWebApp_${ip}'
   properties: {
     startIpAddress: ip
     endIpAddress: ip
