@@ -205,40 +205,30 @@ jobs:
         uses: akiojin/decode-base64-github-action@v0.1.0
         with:
           base64: ${{ needs.deploy-infrastructure.outputs.webapp_name }}
-        run: |
-          echo "Decoded Web App Name: ${{ steps.decode_webapp_name.outputs.decoded }}"
       
       - name: Decode and Echo Key Vault Name
         id: decode_keyvault_name
         uses: akiojin/decode-base64-github-action@v0.1.0
         with:
           base64: ${{ needs.deploy-infrastructure.outputs.keyvault_name }}
-        run: |
-          echo "Decoded Key Vault Name: ${{ steps.decode_keyvault_name.outputs.decoded }}"
       
       - name: Decode and Echo SQL Server Name
         id: decode_sql_server_name
         uses: akiojin/decode-base64-github-action@v0.1.0
         with:
           base64: ${{ needs.deploy-infrastructure.outputs.sql_server_name }}
-          run: |
-          echo "Decoded SQL Server Name: ${{ steps.decode_sql_server_name.outputs.decoded }}"
             
       - name: Decode and Echo SQL Database Name
         id: decode_sql_database_name
         uses: akiojin/decode-base64-github-action@v0.1.0
         with:
           base64: ${{ needs.deploy-infrastructure.outputs.sql_database_name }}
-        run: |
-          echo "Decoded SQL Database Name: ${{ steps.decode_sql_database_name.outputs.decoded }}"
       
       - name: Decode and Echo My Test Value
         id: decode_my_test_value
         uses: akiojin/decode-base64-github-action@v0.1.0
         with:
           base64: ${{ needs.deploy-infrastructure.outputs.my_test_value }}
-        run: |
-          echo "Decoded My Test Value: ${{ steps.decode_my_test_value.outputs.decoded }}"
       
       - name: Echo received outputs
         run: |
