@@ -183,6 +183,10 @@ resource webApp 'Microsoft.Web/sites@2021-03-01' = {
   }
 }
 
+resource existingACR 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' existing = {
+  name: split(acrLoginServer, '.')[0]
+}
+
 resource acrPullRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
   name: guid(resourceGroup().id, webApp.id, 'acrpull')
   properties: {
@@ -190,7 +194,7 @@ resource acrPullRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
     principalType: 'ServicePrincipal'
   }
-  scope: resourceId('Microsoft.ContainerRegistry/registries', split(acrLoginServer, '.')[0])
+  scope: existingACR
 }
 
 resource sqlServerFirewallRules 'Microsoft.Sql/servers/firewallRules@2021-11-01-preview' = {
