@@ -284,7 +284,7 @@ jobs:
           # Write the config to a temporary file
           TEMP_CONFIG_FILE=$(mktemp)
           echo "$CONTAINER_CONFIG" > "$TEMP_CONFIG_FILE"
-                
+          
           # Update the web app configuration
           if az webapp config container set \
             --name "$WEBAPP_NAME" \
@@ -300,8 +300,28 @@ jobs:
           fi
           
           # Clean up the temporary file
-          rm "$TEMP_CONFIG_FILE"
+          rm "$TEMP_CONFIG_FILE" 
 
+      - name: Verify deployment and gather logs
+        run: |
+          RESOURCE_GROUP="${{ secrets.AZURE_RESOURCE_GROUP }}"
+          ACR_NAME="${{ secrets.ACR_NAME }}"
+          WEBAPP_NAME="${{ steps.decode_webapp_name.outputs.decoded }}"
+
+          echo "Listing ACR repositories and tags:"
+          az acr repository list --name $ACR_NAME --output table
+          az acr repository show-tags --name $ACR_NAME --repository todo-list-react --output table
+          az acr repository show-tags --name $ACR_NAME --repository todolist-api --output table
+
+          echo "Restarting Web App:"
+          az webapp restart --name "$WEBAPP_NAME" --resource-group "$RESOURCE_GROUP"
+
+          echo "Waiting for Web App to restart..."
+          sleep 30
+
+          echo "Fetching Web App logs:"
+          az webapp log tail --name "$WEBAPP_NAME" --resource-group "$RESOURCE_GROUP" --duration 60
+          
       - name: Verify Web App Configuration
         run: |
           echo "Fetching Web App configuration..."

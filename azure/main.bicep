@@ -123,6 +123,9 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
 resource webApp 'Microsoft.Web/sites@2021-03-01' = {
   name: webAppName
   location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     serverFarmId: appServicePlan.id
     siteConfig: {
@@ -178,6 +181,16 @@ resource webApp 'Microsoft.Web/sites@2021-03-01' = {
     app: appName
     environment: environment
   }
+}
+
+resource acrPullRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(resourceGroup().id, webApp.id, 'acrpull')
+  properties: {
+    principalId: webApp.identity.principalId
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
+    principalType: 'ServicePrincipal'
+  }
+  scope: resourceId('Microsoft.ContainerRegistry/registries', split(acrLoginServer, '.')[0])
 }
 
 resource sqlServerFirewallRules 'Microsoft.Sql/servers/firewallRules@2021-11-01-preview' = {
