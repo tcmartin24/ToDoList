@@ -200,20 +200,54 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Decode and Echo received outputs
+      - name: Decode and Echo Web App Name
+        id: decode_webapp_name
+        uses: akiojin/decode-base64-github-action@v0.1.0
+        with:
+          base64: ${{ needs.deploy-infrastructure.outputs.webapp_name }}
         run: |
-          decoded_webapp_name=$(echo -n "${{ needs.deploy-infrastructure.outputs.webapp_name }}" | base64 --decode)
-          decoded_keyvault_name=$(echo -n "${{ needs.deploy-infrastructure.outputs.keyvault_name }}" | base64 --decode)
-          decoded_sql_server_name=$(echo -n "${{ needs.deploy-infrastructure.outputs.sql_server_name }}" | base64 --decode)
-          decoded_sql_database_name=$(echo -n "${{ needs.deploy-infrastructure.outputs.sql_database_name }}" | base64 --decode)
-          decoded_my_test_value=$(echo -n "${{ needs.deploy-infrastructure.outputs.my_test_value }}" | base64 --decode)
-          
-          echo "Received Web App Name: '$decoded_webapp_name'"
-          echo "Received Key Vault Name: '$decoded_keyvault_name'"
-          echo "Received SQL Server Name: '$decoded_sql_server_name'"
-          echo "Received SQL Database Name: '$decoded_sql_database_name'"
-          echo "My Test Value1: '$decoded_my_test_value'"
-          echo "My Test Value: '${{ needs.deploy-infrastructure.outputs.test_value }}'"
+          echo "Decoded Web App Name: ${{ steps.decode_webapp_name.outputs.decoded }}"
+      
+      - name: Decode and Echo Key Vault Name
+        id: decode_keyvault_name
+        uses: akiojin/decode-base64-github-action@v0.1.0
+        with:
+          base64: ${{ needs.deploy-infrastructure.outputs.keyvault_name }}
+        run: |
+          echo "Decoded Key Vault Name: ${{ steps.decode_keyvault_name.outputs.decoded }}"
+      
+      - name: Decode and Echo SQL Server Name
+        id: decode_sql_server_name
+        uses: akiojin/decode-base64-github-action@v0.1.0
+        with:
+          base64: ${{ needs.deploy-infrastructure.outputs.sql_server_name }}
+          run: |
+          echo "Decoded SQL Server Name: ${{ steps.decode_sql_server_name.outputs.decoded }}"
+            
+      - name: Decode and Echo SQL Database Name
+        id: decode_sql_database_name
+        uses: akiojin/decode-base64-github-action@v0.1.0
+        with:
+          base64: ${{ needs.deploy-infrastructure.outputs.sql_database_name }}
+        run: |
+          echo "Decoded SQL Database Name: ${{ steps.decode_sql_database_name.outputs.decoded }}"
+      
+      - name: Decode and Echo My Test Value
+        id: decode_my_test_value
+        uses: akiojin/decode-base64-github-action@v0.1.0
+        with:
+          base64: ${{ needs.deploy-infrastructure.outputs.my_test_value }}
+        run: |
+          echo "Decoded My Test Value: ${{ steps.decode_my_test_value.outputs.decoded }}"
+      
+      - name: Echo received outputs
+        run: |
+          echo "Received Web App Name: ${{ steps.decode_webapp_name.outputs.decoded }}"
+          echo "Received Key Vault Name: ${{ steps.decode_keyvault_name.outputs.decoded }}"
+          echo "Received SQL Server Name: ${{ steps.decode_sql_server_name.outputs.decoded }}"
+          echo "Received SQL Database Name: ${{ steps.decode_sql_database_name.outputs.decoded }}"
+          echo "My Test Value1: ${{ steps.decode_my_test_value.outputs.decoded }}"
+            echo "My Test Value: '${{ needs.deploy-infrastructure.outputs.test_value }}'"
 
       
       - name: Log in to Azure Container Registry
