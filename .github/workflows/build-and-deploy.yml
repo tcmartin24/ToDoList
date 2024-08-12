@@ -281,15 +281,26 @@ jobs:
           EOF
           )
 
-          # Encode the config to base64
-          ENCODED_CONFIG=$(echo "$CONTAINER_CONFIG" | base64 -w 0)
-          
+          # Write the config to a temporary file
+          TEMP_CONFIG_FILE=$(mktemp)
+          echo "$CONTAINER_CONFIG" > "$TEMP_CONFIG_FILE"
+                
           # Update the web app configuration
-          az webapp config container set \
+          if az webapp config container set \
             --name "$WEBAPP_NAME" \
             --resource-group "$RESOURCE_GROUP" \
             --multicontainer-config-type COMPOSE \
-            --multicontainer-config-file "$ENCODED_CONFIG"
+            --multicontainer-config-file "$TEMP_CONFIG_FILE"; then
+            echo "Web App configuration updated successfully"
+          else
+            echo "Failed to update Web App configuration"
+            echo "Container config content:"
+            cat "$TEMP_CONFIG_FILE"
+            exit 1
+          fi
+          
+          # Clean up the temporary file
+          rm "$TEMP_CONFIG_FILE"
 
       - name: Verify Web App Configuration
         run: |
