@@ -261,7 +261,7 @@ jobs:
         run: |
           RESOURCE_GROUP="${{ secrets.AZURE_RESOURCE_GROUP }}"
           ACR_LOGIN_SERVER="${{ env.ACR_LOGIN_SERVER }}"
-          WEBAPP_NAME="${{ needs.deploy-infrastructure.outputs.webapp_name }}"
+          WEBAPP_NAME="${{ steps.decode_webapp_name.outputs.decoded }}"
           
           echo "Updating Web App: $WEBAPP_NAME"
           echo "Resource Group: $RESOURCE_GROUP"
@@ -294,4 +294,4 @@ jobs:
       - name: Verify Web App Configuration
         run: |
           echo "Fetching Web App configuration..."
-          az webapp config container show --name "${{ needs.deploy-infrastructure.outputs.webapp_name }}" --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}"
+          az webapp config container show --name "${{ steps.decode_webapp_name.outputs.decoded }}" --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}"
