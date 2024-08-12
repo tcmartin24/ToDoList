@@ -313,15 +313,6 @@ jobs:
           az acr repository show-tags --name $ACR_NAME --repository todo-list-react --output table
           az acr repository show-tags --name $ACR_NAME --repository todolist-api --output table
 
-          echo "Restarting Web App:"
-          az webapp restart --name "$WEBAPP_NAME" --resource-group "$RESOURCE_GROUP"
-
-          echo "Waiting for Web App to restart..."
-          sleep 30
-
-          echo "Fetching Web App logs:"
-          az webapp log tail --name "$WEBAPP_NAME" --resource-group "$RESOURCE_GROUP" --duration 60
-          
       - name: Verify Web App Configuration
         run: |
           echo "Fetching Web App configuration..."
