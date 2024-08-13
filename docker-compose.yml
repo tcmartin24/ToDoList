@@ -1,14 +1,14 @@
 ﻿services:
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    platform: linux/amd64
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=YourStrong@Passw0rd
-    ports:
-      - "1433:1433"
-    volumes:
-      - ./sqlserver_data:/var/opt/mssql
+#  sqlserver:
+#    image: mcr.microsoft.com/mssql/server:2022-latest
+#    platform: linux/amd64
+#    environment:
+#      - ACCEPT_EULA=Y
+#      - SA_PASSWORD=YourStrong@Passw0rd
+#    ports:
+#      - "1433:1433"
+#    volumes:
+#      - ./sqlserver_data:/var/opt/mssql
 #    healthcheck:
 #      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrong@Passw0rd -Q 'SELECT 1' || exit 1"]
 #      interval: 10s
@@ -22,16 +22,14 @@
       context: ./ToDoList-API
       dockerfile: Dockerfile
     ports:
-      - "5000:80"
+      - "8080:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=TodoList;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
-      - CorsOrigins=http://localhost:3000
-    depends_on:
-      sqlserver:
-        condition: service_healthy
+      - ASPNETCORE_HTTP_PORTS=8080
+      - CORS_ORIGINS=http://localhost:3000
+      - DOTNET_RUNNING_IN_CONTAINER=true
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -42,12 +40,12 @@
       context: ./todo-list-react
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "3000:80"
     environment:
-#      - VITE_API_BASE_URL=http://localhost:5000
-      - VITE_API_BASE_URL=http://host.docker.internal:5000
+      - VITE_API_BASE_URL=http://localhost:8080
+      - VITE_APP_MODE=local
     depends_on:
       - todolist-api
 
-volumes:
-  sqlserver_data:
+#volumes:
+#  sqlserver_data:

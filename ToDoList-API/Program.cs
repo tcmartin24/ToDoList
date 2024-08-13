@@ -13,6 +13,10 @@ namespace ToDoList_API
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.AddEnvironmentVariables();
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
@@ -26,13 +30,36 @@ namespace ToDoList_API
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            
+            // Debug: Print all configuration values
+            foreach (var c in Configuration.AsEnumerable())
+            {
+                Console.WriteLine($"Config: {c.Key} = {c.Value}");
+            }
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            // Determine which database to use
+            var connectionString = Configuration.GetConnectionString("DefaultConnection");
+            Console.WriteLine($"Connection string: {connectionString}");
+            Console.WriteLine($"Using in-memory database: {string.IsNullOrEmpty(connectionString) || connectionString.Contains("${DB_SERVER}")}");
+
+            if (string.IsNullOrEmpty(connectionString) || connectionString.Contains("${DB_SERVER}"))
+            {
+                // Use in-memory database if connection string is not properly set
             services.AddDbContext<TodoContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                    options.UseInMemoryDatabase("TodoList"));
+            }
+            else
+            {
+                // Use SQL Server with the provided connection string
+                services.AddDbContext<TodoContext>(options =>
+                    options.UseSqlServer(connectionString));
+            }
+
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
@@ -55,11 +82,15 @@ namespace ToDoList_API
             app.UseAuthorization();
 
             // Configure CORS
-            var corsOrigins = Configuration.GetValue<string>("CorsOrigins")?.Split(',') ?? Array.Empty<string>();
+            var corsOrigins = Configuration.GetValue<string>("CORS_ORIGINS") ?? Configuration.GetValue<string>("CorsOrigins");
+            Console.WriteLine($"Cross Origins string: {corsOrigins}");
+            if (!string.IsNullOrEmpty(corsOrigins))
+            {
             app.UseCors(builder => builder
-                .WithOrigins(corsOrigins)
+                .WithOrigins(corsOrigins.Split(','))
                 .AllowAnyMethod()
                 .AllowAnyHeader());
+            }
 
             app.UseRouting();
             app.UseEndpoints(endpoints =>

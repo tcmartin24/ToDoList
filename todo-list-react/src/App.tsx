@@ -4,7 +4,10 @@ import TodoList from './components/TodoList';
 import AddTodoForm from './components/AddTodoForm';
 import { Todo } from "./shared/types";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/todos';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+const TODOS_ENDPOINT = '/api/todos';
+
+console.log(`API_BASE_URL = "${API_BASE_URL}"`);
 
 function App() {
     const [todos, setTodos] = useState<Todo[]>([]);
@@ -21,8 +24,8 @@ function App() {
         setIsLoading(true);
         setError(null);
         try {
-            console.log('Attempting to fetch todos from: ', API_BASE_URL);
-            const response = await axios.get<Todo[]>(API_BASE_URL);
+            console.log('Attempting to fetch todos from: ', `${API_BASE_URL}${TODOS_ENDPOINT}`);
+            const response = await axios.get<Todo[]>(`${API_BASE_URL}${TODOS_ENDPOINT}`);
             console.log('Response received:', response);
             setTodos(response.data);
         } catch (error) {
@@ -44,11 +47,11 @@ function App() {
         try {
             if (todo.id) {
                 // Update existing todo
-                const response = await axios.put<Todo>(`${API_BASE_URL}/${todo.id}`, todo);
+                const response = await axios.put<Todo>(`${API_BASE_URL}${TODOS_ENDPOINT}/${todo.id}`, todo);
                 setTodos(todos.map(t => t.id === todo.id ? response.data : t));
             } else {
                 // Add new todo
-                const response = await axios.post<Todo>(API_BASE_URL, { title: todo.title, isComplete: false });
+                const response = await axios.post<Todo>(`${API_BASE_URL}${TODOS_ENDPOINT}`, { title: todo.title, isComplete: false });
             setTodos([...todos, response.data]);
             }
         } catch (error) {
@@ -67,7 +70,7 @@ function App() {
             const todoToUpdate = todos.find(todo => todo.id === id);
             if (!todoToUpdate) return;
 
-            const response = await axios.put<Todo>(`${API_BASE_URL}/${id}`, {
+            const response = await axios.put<Todo>(`${API_BASE_URL}${TODOS_ENDPOINT}/${id}`, {
                 ...todoToUpdate,
                 isComplete: !todoToUpdate.isComplete
             });
@@ -85,7 +88,7 @@ function App() {
         setIsLoading(true);
         setError(null);
         try {
-            await axios.delete(`${API_BASE_URL}/${id}`);
+            await axios.delete(`${API_BASE_URL}${TODOS_ENDPOINT}/${id}`);
             setTodos(todos.filter(todo => todo.id !== id));
         } catch (error) {
             setError('Failed to delete todo. Please try again.');

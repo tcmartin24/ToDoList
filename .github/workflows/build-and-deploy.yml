@@ -268,16 +268,16 @@ jobs:
           
           # Create the multi-container config
           CONTAINER_CONFIG=$(cat << EOF
-          [
-            {
-              "name": "frontend",
-              "image": "${ACR_LOGIN_SERVER}/todo-list-react:latest"
-            },
-            {
-              "name": "backend",
-              "image": "${ACR_LOGIN_SERVER}/todolist-api:latest"
-            }
-          ]
+          services:
+            frontend:
+              image: "${ACR_LOGIN_SERVER}/todo-list-react:latest"
+              ports:
+                - "3000:3000"
+            backend:
+              image: "${ACR_LOGIN_SERVER}/todolist-api:latest"
+              ports:
+                - "80:80"
+
           EOF
           )
 

@@ -24,7 +24,7 @@ export default defineConfig(({ command, mode }) => {
     server: useProxy ? {
       proxy: {
         '/api': {
-          target: env.VITE_API_BASE_URL || 'http://localhost:5275',
+          target: env.VITE_API_BASE_URL || 'http://localhost:8080',
           changeOrigin: true,
           secure: false,
           configure: (proxy, options) => {
@@ -34,9 +34,9 @@ export default defineConfig(({ command, mode }) => {
       },
     } : {},
     logLevel: 'info',
-    define: {
-      'import.meta.env.VITE_API_BASE_URL': JSON.stringify(env.VITE_API_BASE_URL),
-    },
+    // define: {
+    //   'import.meta.env.VITE_API_BASE_URL': JSON.stringify(env.VITE_API_BASE_URL),
+    // },
   }
 });
 
