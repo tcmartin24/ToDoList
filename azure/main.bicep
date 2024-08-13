@@ -16,6 +16,7 @@ var sqlDBName = '${appName}-db'
 var adminUsername = 'sqladmin'
 var webAppName = '${appName}-${environment}-${substring(uniqueString(resourceGroup().id), 0, 5)}'
 var appServicePlanName = 'asp-${appName}-${environment}-${substring(uniqueString(resourceGroup().id), 0, 5)}'
+var privateDnsZoneName = 'privatelink${environment().suffixes.sqlServerHostname}'
 
 resource generatePassword 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   name: 'generatePassword'
@@ -52,6 +53,16 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
           ]
         }
       }
+      {
+        tenantId: subscription().tenantId
+        objectId: webApp.identity.principalId
+        permissions: {
+          secrets: [
+            'get'
+            'list'
+          ]
+        }
+      }
     ]
     sku: {
       name: 'standard'
@@ -78,10 +89,64 @@ resource sqlServer 'Microsoft.Sql/servers@2021-11-01-preview' = {
   properties: {
     administratorLogin: adminUsername
     administratorLoginPassword: generatePassword.properties.outputs.password
+    publicNetworkAccess: 'Disabled'
   }
   tags: {
     app: appName
     environment: environment
+  }
+}
+
+resource sqlServerPrivateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
+  name: 'pe-${sqlServerName}'
+  location: location
+  properties: {
+    privateLinkServiceConnections: [
+      {
+        name: 'MyConnection'
+        properties: {
+          privateLinkServiceId: sqlServer.id
+          groupIds: [
+            'sqlServer'
+          ]
+        }
+      }
+    ]
+    subnet: {
+      id: '${appGatewayModule.outputs.vnetId}/subnets/${appGatewayModule.outputs.sqlServerSubnetName}'
+    }
+  }
+}
+
+resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+  name: privateDnsZoneName
+  location: 'global'
+}
+
+resource privateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+  parent: privateDnsZone
+  name: '${privateDnsZoneName}-link'
+  location: 'global'
+  properties: {
+    registrationEnabled: false
+    virtualNetwork: {
+      id: appGatewayModule.outputs.vnetId
+    }
+  }
+}
+
+resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2021-05-01' = {
+  parent: sqlServerPrivateEndpoint
+  name: 'dnsgroupname'
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'config1'
+  properties: {
+          privateDnsZoneId: privateDnsZone.id
+        }
+      }
+    ]
   }
 }
 
@@ -170,16 +235,40 @@ resource webApp 'Microsoft.Web/sites@2021-03-01' = {
           name: 'DB_PASSWORD'
           value: '@Microsoft.KeyVault(SecretUri=${keyVault.properties.vaultUri}secrets/TodoListSqlAdminPassword)'
         }
+        {
+          name: 'WEBSITE_DNS_SERVER'
+          value: '168.63.129.16'
+        }
       ]
       linuxFxVersion: empty(multiContainerConfigContent) ? 'DOCKER|${acrLoginServer}/todo-list-react:latest' : 'COMPOSE|${multiContainerConfigContent}'
       alwaysOn: true
       http20Enabled: true
     }
     httpsOnly: true
+    virtualNetworkSubnetId: '${appGatewayModule.outputs.vnetId}/subnets/${appGatewayModule.outputs.webAppSubnetName}'
   }
   tags: {
     app: appName
     environment: environment
+  }
+}
+
+module appGatewayModule './appGateway.bicep' = {
+  name: 'appGatewayDeployment'
+  params: {
+    location: location
+    appName: appName
+    environment: environment
+    webAppName: webApp.name
+  }
+}
+
+resource webAppNetworkConfig 'Microsoft.Web/sites/networkConfig@2021-03-01' = {
+  parent: webApp
+  name: 'virtualNetwork'
+  properties: {
+    subnetResourceId: '${appGatewayModule.outputs.vnetId}/subnets/${appGatewayModule.outputs.webAppSubnetName}'
+    swiftSupported: true
   }
 }
 
@@ -195,15 +284,6 @@ resource acrPullRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-
     principalType: 'ServicePrincipal'
   }
   scope: existingACR
-}
-
-resource sqlServerFirewallRules 'Microsoft.Sql/servers/firewallRules@2021-11-01-preview' = {
-  parent: sqlServer
-  name: 'AllowAllWindowsAzureIps'
-  properties: {
-    startIpAddress: '0.0.0.0'
-    endIpAddress: '0.0.0.0'
-  }
 }
 
 // Capture resource properties into global variables

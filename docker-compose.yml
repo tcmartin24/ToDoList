@@ -27,7 +27,7 @@
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - CORS_ORIGINS=http://localhost:3000
-      - DOTNET_RUNNING_IN_CONTAINER=true
+#      - DOTNET_RUNNING_IN_CONTAINER=true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
